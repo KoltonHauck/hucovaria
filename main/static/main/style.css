@@ -1,0 +1,106 @@
+#cy {
+	height: 70vh;
+	width: 70wh;
+	position: relative;
+}
+
+.tablink {
+    background-color: inherit;
+    border: none;
+    outline: none;
+}
+
+.tablink:hover {
+    color: white;
+}
+
+.tablink.active {
+    background-color: #ccc;
+}
+
+.start-inactive {
+    display: none;
+}
+
+.dot {
+	height: 18px;
+	width: 18px;
+	border-radius: 50%;
+	display: inline-block;
+}
+
+.red {
+	background-color: red;
+}
+
+.blue {
+	background-color: blue;
+}
+
+
+#cy-toolbar {
+}
+
+#table-wrapper {
+	overflow:hidden;
+	overflow-y:scroll;
+	overflow-x: scroll;
+	height: 60vh;
+}
+
+body {
+  background: #fafafa;
+  color: #333333;
+  margin-top: 5rem;
+  position: absolute;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  color: #444444;
+}
+
+.bg-steel {
+  background-color: #5f788a;
+}
+
+.site-header .navbar-nav .nav-link #cy-toolbar{
+  color: #cbd5db;
+}
+
+.site-header .navbar-nav .nav-link:hover {
+  color: #ffffff;
+}
+
+.site-header .navbar-nav .nav-link.active {
+  font-weight: 500;
+}
+
+.chip {
+  display: inline-block;
+  padding: 0 7px;
+  height: 30px;
+  font-size: 10px;
+  font-weight: bold;
+  line-height: 30px;
+  border-radius: 25px;
+  background-color: #5f788a;
+  margin: 2px;
+}
+
+.closebtn {
+  padding-left: 5px;
+  color: #888;
+  font-weight: bold;
+  float: right;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.closebtn:hover {
+  color: #000;
+}
+

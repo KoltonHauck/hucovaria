@@ -1,0 +1,295 @@
+{% extends "base.html" %}
+
+{% block content %}
+		<h1>{{ title }}</h1>
+		<hr>
+		<div class="container">
+			<form class="form-horizontal" id="myform">
+			<div class="row">
+
+				<!-- Host Strains Selection chunk -->				
+				<div class="col">
+					<h4>Human Proteins</h4>
+						<div class="form-group">
+							<textarea class="form-control" id="human_prots_text" name="human_prots_text" placeholder="Example: ACE2, ARF3, HLA-G, MARK3" rows="6"></textarea>
+						</div>
+
+						<div class="btn-group">
+							<button type="button" class="btn btn-primary" onclick="document.getElementById('human_prots_text').value='ACE2,ARF3,HLA-G,MARK3';">Sample</button>
+							<button type="button" class="btn btn-secondary" onclick="document.getElementById('human_prots_text').value = '';">Clear</button>
+						</div><br>
+
+				</div>
+
+				<!-- Viral Strains Selection chunk -->
+				<div class="col">
+					<h4>SARS-CoV-2 Strains</h4>
+						<div id="sars_strains_div" class="">
+						{% for strain in strains %}
+							<div class="form-check">
+								<input class="form-check-input" type="checkbox" value="1" id={{strain.name}} name={{strain.name}} checked>
+								<label class="form-check-label" for={{strain.name}}>{{strain.name}} ({{strain.label}})</label>
+							</div>
+						{% endfor %}
+						</div>
+
+						<div class="btn-group">
+							<button id="sars_strains_button" type="button" class="btn btn-secondary" onclick="selectOrClearAllStrains();">De-select All</button>
+						</div>
+				</div>
+
+				<!-- Virus Protein Selection chunk -->
+				<div class="col">
+					<h4>SARS-CoV-2 Proteins</h4>
+						<div class="form-group">
+							<select multiple size="6" class="form-control" name="sars_proteins" id="sars_proteins">
+								{% for prot in virusProteins %}
+									<option onclick="myFunct(this)" id="select_{{prot}}">{{prot}}</option>
+								{% endfor %}
+							</select>
+						</div>
+
+						<div class="btn-group">
+							<button id="sars_proteins_button" type="button" class="btn btn-primary" onclick="selectOrClearAll();">Select All</button>
+						</div>
+
+					<div id="chips">
+					</div>
+				</div>
+
+
+				<!-- Annotation chunk & interaction -->
+				<div class="col" id="annotation_div">
+					<h4>Annotation Type</h4>
+
+					{% for annotation in annotations %}
+						<div class="form-check">
+							<input class="form-check-input" type="radio" name="Annotation" id={{annotation.name}} value={{annotation.name}} data-toggle="collapse" data-target=".ontologyCollapse.show">
+							<label class="form-check-label" for={{annotation.name}}>{{annotation.pprint}}</label>
+						</div>
+					{% endfor %}
+
+					<div class="form-check">
+						<input class="form-check-input" type="radio" name="Annotation" id="Gene_Ontology" value="Gene_Ontology" data-toggle="collapse" data-target=".ontologyCollapse:not(.show)" checked>
+						<label class="form-check-label" for="Gene_Ontology">Gene Ontology</label>
+					</div>
+
+					<!-- collapsable ontology menu -->
+					<div class="ontologyCollapse panel-collapse collapse">
+						{% for ontology in ontologies %}
+							<div class="form-check">
+								<input class="form-check-input" type="checkbox" name={{ontology}} value="1" id={{ontology}} checked>
+								<label class="form-check-label" for={{ontology}}>{{ontology}}</label>
+							</div>
+						{% endfor %}
+					</div>
+
+					<hr>
+
+                    <!-- select interaction type -->
+					<h4>Interaction Type</h4>
+					<div>
+						<div class="form-check">
+							<input class="form-check-input" type="radio" name="interaction" id="interolog" value="Interolog">
+							<label class="form-check-label" for="interolog">Interolog</label>
+						</div>
+
+						<div class="form-check">
+							<input class="form-check-input" type="radio" name="interaction" id="domain" value="Domain">
+							<label class="form-check-label" for="domain">Domain</label>
+						</div>
+
+						<div class="form-check">
+							<input class="form-check-input" type="radio" name="interaction" id="combined" value="Combined" checked>
+							<label class="form-check-label" for="combined">Combined</label>
+						</div>
+					</div>
+
+				</div>
+			</div>
+			<div>
+				<input type="hidden" id="hidden_sars_prots" name="hidden_sars_prots" value="">
+			</div>
+
+			<!-- submit button -->
+			<hr/>
+
+            <div class="form-group">
+                <textarea class="form-control" id="result_name" name="result_name" placeholder="Enter name for result (optional)"></textarea>
+            </div>
+
+
+			<div class="container"><button type="submit" value="Submit" class="btn btn-primary">Submit Query</button></div>
+			</form>
+		</div>
+<script>
+function getProteinSelection() {
+	ancestor = document.getElementById("chips");
+	descendants = ancestor.getElementsByTagName("div");
+	myArr = [];
+	for (var i=0; i<descendants.length; i++) {
+		myArr.push(descendants[i].id);
+	}
+	document.getElementById("hidden_sars_prots").value = myArr;
+	console.log("ran getProteinSelection()");
+}
+</script>
+
+<script type="text/javascript">
+	document.getElementById("myform").addEventListener("submit", 
+		function(e) {
+			e.preventDefault();
+
+			let formData = new FormData();
+
+            //human proteins
+			formData.append("human_prots_text", document.querySelector("#human_prots_text").value);
+			console.log("added human_prots_text");
+
+			//virus proteins
+			getProteinSelection();
+			formData.append('hidden_sars_prots', document.querySelector("#hidden_sars_prots").value);
+			console.log("added hidden_sars_prots");
+
+            //strains
+			{% for strain in strains %}
+			    formData.append("{{ strain.name }}", document.getElementById("{{ strain.name }}").value);
+			{% endfor %}
+			console.log("added strains");
+
+            //ontologies
+			{% for ontology in ontologies %}
+				formData.append("{{ ontology }}", document.getElementById("{{ ontology }}").value);
+			{% endfor %}
+			console.log("added ontologies");
+
+            //annotations
+		    formData.append("Annotation", document.querySelector('input[name="Annotation"]:checked').value);
+            console.log("added annotations");
+
+            //GO
+            formData.append("Gene_Ontology", document.getElementById("Gene_Ontology").value);
+            console.log("added GO");
+
+            //result_name
+            formData.append("result_name", document.querySelector("#result_name").value);
+            console.log("added result_name");
+
+            //csrf token
+            formData.append("csrfmiddlewaretoken", '{{ csrf_token }}');
+            console.log("add csrf token");
+            
+            alert("Your query has been submitted");            
+			fetch("{% url 'main:query' %}", {
+				method: 'POST',
+				body: formData
+			})
+			.then(response => response)
+			.then(data => {
+				alert("Success, your query is complete and available in the results tab");
+			})
+			
+			.catch(error => {
+                alert(`error: ${error}`);
+                console.log(error);
+			});
+});
+
+</script>
+
+<script>
+function selectOrClearAllStrains() {
+	const button = document.getElementById("sars_strains_button");
+
+	let strains = ["B.1.1.7", "B.1.351", "B.1.427", "B.1.525", "B.1.526", "B.1.617", "B.1.617.2", "B.1.617.3", "B.1.621", "P.1", "P.2", "Reference"]
+
+	if (button.innerHTML === "Select All") {
+		button.innerHTML = "De-select All";
+		button.className = "btn btn-secondary";
+
+		for (var i=0; i<strains.length; i++) {
+			document.getElementById(strains[i]).checked = true;
+		}
+
+	} else {
+		button.innerHTML = "Select All";
+		button.className = "btn btn-primary";
+
+		for (var i=0; i<strains.length; i++) {
+			document.getElementById(strains[i]).checked = false;
+		}
+	}
+}
+</script>
+
+<script>
+function selectOrClearAll() {
+	const button = document.getElementById("sars_proteins_button");
+
+	const ancestor = document.getElementById("chips");
+	const chipsToRemove = ancestor.getElementsByTagName("div");
+	toRemove = [];
+
+	for (var i=0; i<chipsToRemove.length; i++) {
+		toRemove.push(chipsToRemove[i].id);
+	}
+
+	if (button.innerHTML === "Select All") {
+		button.innerHTML = "Clear All";
+		button.className = "btn btn-secondary";
+
+		const multiSelect = document.getElementById("sars_proteins");
+		const toSelect = [];
+
+		for (var i=0; i<multiSelect.options.length; i++) {
+			const id = multiSelect.options[i].id.split("_");
+			toSelect.push(id[1]);
+		}
+		for (var i=0; i<toRemove.length; i++) {
+			const index = toSelect.indexOf(toRemove[i]);
+			toSelect.splice(index, 1);
+		}
+		for (var i=0; i<toSelect.length; i++) {
+			myFunct(toSelect[i]);
+		}
+
+	} else {
+		button.innerHTML = "Select All";
+		button.className = "btn btn-primary";
+
+		for (var i=0; i<toRemove.length; i++) {
+			document.getElementById(toRemove[i]).remove();
+		}
+	}
+
+}
+</script>
+
+<script>
+function myFunct(selection) {
+	if (typeof(selection) === "object") {
+		selection = selection.value;
+	}
+	if (document.contains(document.getElementById(selection))) {
+		document.getElementById(selection).remove();
+	} else {
+		const newChip = document.createElement("div");
+		newChip.className = "chip";
+		newChip.innerText=selection;
+		newChip.id = selection;
+
+		const newSpan = document.createElement("span");
+		newSpan.className="closebtn";
+		newSpan.onclick= function() {
+			this.parentElement.remove();
+		}
+		newSpan.innerHTML="&times;";
+
+		newChip.appendChild(newSpan);
+		chips = document.getElementById("chips");
+		chips.appendChild(newChip);
+	}
+}
+</script>
+
+{% endblock content %}
