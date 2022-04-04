@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block content %}
 		<h1>{{ title }}</h1>
@@ -122,6 +123,7 @@
 			<div class="container"><button type="submit" value="Submit" class="btn btn-primary">Submit Query</button></div>
 			</form>
 		</div>
+
 <script>
 function getProteinSelection() {
 	ancestor = document.getElementById("chips");
@@ -195,9 +197,6 @@ function getProteinSelection() {
 			});
 });
 
-</script>
-
-<script>
 function selectOrClearAllStrains() {
 	const button = document.getElementById("sars_strains_button");
 
@@ -220,9 +219,7 @@ function selectOrClearAllStrains() {
 		}
 	}
 }
-</script>
 
-<script>
 function selectOrClearAll() {
 	const button = document.getElementById("sars_proteins_button");
 
@@ -263,9 +260,7 @@ function selectOrClearAll() {
 	}
 
 }
-</script>
 
-<script>
 function myFunct(selection) {
 	if (typeof(selection) === "object") {
 		selection = selection.value;

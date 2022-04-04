@@ -1,75 +1,10 @@
-{% extends "base.html" %}
-{% load static %}
-
-
-{% block content %}
-	<h1>{{ title }}</h1>
-	<h6 class="muted">{{ subtitle }}</h6>
-	<hr>
-<div class="container">
-	<div class="row">
-		<div id="cy-wrapper" class="col-sm-9">
-			<div id="cy" class="rounded border border-info"></div>
-		</div>
-
-		<div id="cy-toolbar" class="col-sm-3 bg-steel rounded">
-		<h3>
-    		<button class="tablink rounded active" onclick="changeBar(event, 'legend')">Legend</button>
-	    	|<button class="tablink rounded" onclick="changeBar(event, 'filter')">Filter</button>
-		</h3>
-			<hr>
-			<div class="tabcontent container" id="legend">
-    			<small>
-    			<h5>Nodes</h5>
-    			<p><span class="dot red"></span>: Pathogen Proteins</p>
-    			<p><span class="dot blue"></span>: Host Proteins</p>
-    			<h5>Edges</h5>
-    			{% for strain in strain_colors %}
-    				<p class="rounded text-light" style="background-color: {{strain.color}}">{{ strain.name }}</p>
-    			{% endfor %}
-    			</small>
-			</div>
-
-            <div class="tabcontent container start-inactive" id="filter">
-                <!-- strains -->
-                <div class="container">
-                    <label for="strains" class="form-label">Strain Display Toggle</label>
-                    <select multiple size="5" name="strains" id="strains" class="form-control">
-                        {% for strain in strain_colors %}
-                            <option onclick="toggleStrain('{{ strain.name }}')" id="{{ strain.name }}">{{ strain.name }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-
-                <!-- virus proteins -->
-                <div class="container">
-                    <label for="nodes" class="form-label">Protein Display Toggle</label>
-                    <select multiple size="5" name="nodes" id="nodes" class="form-control">
-                        {% for n in nodes %}
-                            <option onclick="toggleNode('{{n.id}}')" id="{{n.id}}_option">{{n.id}}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-            </div>
-
-		</div>
-	</div>
-</div>
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/cytoscape/3.20.0/cytoscape.min.js"></script>
-<script src="https://unpkg.com/webcola@3.3.8/WebCola/cola.min.js"></script>
-<script src="https://unpkg.com/cytoscape-cola@2.2.3/cytoscape-cola.js"></script>
-<script src="{% static 'main/cytoscape-cxtmenu.js' %}"></script>
-<script src="{% static 'main/cytoscape-navigator.js' %}"></script>
-
-<script>
 function toggleNode(nodeID) {
     var nodeList = cy.elements(`node[id="${nodeID}"]`);
     for (var i = 0; i < nodeList.length; i++) {
         if (nodeList[i].style("visibility") === "visible") {
             nodeList[i].style("visibility", "hidden");
             document.getElementById(`${nodeID}_option`).style.backgroundColor = "#5f788a";
-        } else {            
+        } else {
             nodeList[i].style("visibility", "visible");
             document.getElementById(`${nodeID}_option`).style.backgroundColor = "#ffffff";
         }
@@ -96,7 +31,7 @@ function changeBar(evt, display) {
     for (i=0; i < tabcontent.length; i++) {
         tabcontent[i].style.display = "none";
     }
-    
+
     tablinks = document.getElementsByClassName("tablink");
     for (i = 0; i < tablinks.length; i++) {
         tablinks[i].className = tablinks[i].className.replace(" active", "");
@@ -209,5 +144,4 @@ cy.cxtmenu({
         },
     ]
 });
-</script>
-{% endblock %}
+
