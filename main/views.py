@@ -147,7 +147,7 @@ class TableView(generic.ListView):
 	paginate_by = 100
 
 	def get_queryset(self):
-		result_id = self.request.META['PATH_INFO'].split('/')[2]
+		result_id = self.request.META['PATH_INFO'].split('/')[3]
 		annotation = Result.objects.get(pk=result_id).annotation
 		qs = getInteractionQuerySet(result_id)
 		qs_l = qs.values()
@@ -183,7 +183,7 @@ class TableView(generic.ListView):
 		return qs_l
 
 	def get_context_data(self, **kwargs):
-		result_id = self.request.META['PATH_INFO'].split('/')[2]
+		result_id = self.request.META['PATH_INFO'].split('/')[3]
 		context = super().get_context_data(**kwargs)
 		annotation = Result.objects.get(pk=result_id).annotation
 		context['annotation'] = annotation
