@@ -4,10 +4,19 @@
 
 {% block content %}
 	<h1>{{ title }}</h1>
-	<h6 class="muted">{{ subtitle }}</h6>
 	<hr>
 <div class="container">
 	<div class="row">
+        <div>
+            <span>
+                #Virus Proteins: {{ virus_count }}
+                | #Host Proteins: {{ host_count }}
+                | #Interactions: {{ interaction_count }}
+            </span>
+            <p>Right click &amp; hold on nodes for external links</p>
+            <p><a class="btn btn-primary" href="{% url 'main:table' result_id %}">To Table</a></p>
+        </div>
+	
 		<div id="cy-wrapper" class="col-sm-9">
 			<div id="cy" class="rounded border border-info"></div>
 		</div>
@@ -21,11 +30,15 @@
 			<div class="tabcontent container" id="legend">
     			<small>
     			<h5>Nodes</h5>
-    			<p><span class="dot red"></span>: Pathogen Proteins</p>
-    			<p><span class="dot blue"></span>: Host Proteins</p>
+    			<p><i class="fa fa-circle fa-red"></i>: Pathogen Proteins</p>
+    			<p><i class="fa fa-circle fa-blue"></i>: Host Proteins</p>
     			<h5>Edges</h5>
     			{% for strain in strain_colors %}
-    				<p class="rounded text-light" style="background-color: {{strain.color}}">{{ strain.name }}</p>
+    			    {% if strain.color == "#000000" %}
+        				<p class="rounded text-light {{strain.color}}" style="background-color: {{strain.color}}">{{ strain.name }}</p>
+                    {% else %}
+        				<p class="rounded text-dark {{strain.color}}" style="background-color: {{strain.color}}">{{ strain.name }}</p>
+    				{% endif %}
     			{% endfor %}
     			</small>
 			</div>

@@ -1,7 +1,31 @@
+.fa-question-circle {
+    font-size: 15px;
+}
+
+.#000000 {
+    color: white;
+}
+
+.fa-red {
+    color: red;
+}
+
+.fa-blue {
+    color: blue;
+}
+
 #cy {
 	height: 70vh;
 	width: 70wh;
 	position: relative;
+}
+
+a {
+    margin: 2px;
+}
+
+button {
+    margin: 5px;
 }
 
 .tablink {
@@ -21,22 +45,6 @@
 .start-inactive {
     display: none;
 }
-
-.dot {
-	height: 18px;
-	width: 18px;
-	border-radius: 50%;
-	display: inline-block;
-}
-
-.red {
-	background-color: red;
-}
-
-.blue {
-	background-color: blue;
-}
-
 
 #cy-toolbar {
 }
@@ -89,6 +97,7 @@ h1, h2, h3, h4, h5, h6 {
   border-radius: 25px;
   background-color: #5f788a;
   margin: 2px;
+  color: white;
 }
 
 .closebtn {

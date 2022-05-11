@@ -5,9 +5,10 @@ from django.urls import reverse
 from django.utils import timezone
 from uuid import uuid4
 import os
-from .models import *
 import pandas as pd
 import mimetypes
+
+from .models import *
 
 def home(request):
 	context = {
@@ -28,10 +29,11 @@ def home(request):
 					{'name': 'B.1.621', 'label': 'Mu'},
 					{'name': 'P.1', 'label': 'Gamma'},
 					{'name': 'P.2', 'label': 'Zeta'},
-					{'name': 'Reference', 'label': 'N/A'},
+					{'name': 'Reference', 'label': 'Wuhan'},
 					],
 		'annotations': [{'name': 'tissue_expression', 'pprint': 'Tissue Expression'}, {'name': 'localization', 'pprint': 'Localization'}, {'name': 'KEGG', 'pprint': 'KEGG'}],
 		'ontologies': ['MF', 'BP', 'CC'],
+		'result_name': str(uuid4()),
 	}
 	return render(request, 'home.html', context)
 
@@ -73,7 +75,7 @@ def makeQuery(request):
 		'Reference']
 
 	#add to Result
-    newID = timezone.now().strftime('%Y%m-%d%H-%M%S-') + str(uuid4())
+    newID = str(uuid4())
 
     filename=f'media/{newID}.csv'
     file = f'{newID}.csv'
@@ -194,50 +196,54 @@ class TableView(generic.ListView):
 		return context
 
 def network(request, result_id):
-	context = {}
+    context = {}
 
-	df = pd.read_csv(f'media/{result_id}.csv')
-	cols = ['id', 'color']
-	virus = df[['virus']].drop_duplicates()
-	virus['color'] = ['red' for x in range(len(virus))]
-	host = df[['host']].drop_duplicates()
-	host['color'] = ['blue' for x in range(len(host))]
-	virus.columns=cols
-	host.columns=cols
-	nodes = pd.concat([virus, host])
+    df = pd.read_csv(f'media/{result_id}.csv')
+    cols = ['id', 'color']
+    virus = df[['virus']].drop_duplicates()
+    virus['color'] = ['red' for x in range(len(virus))]
+    host = df[['host']].drop_duplicates()
+    host['color'] = ['blue' for x in range(len(host))]
+    virus.columns=cols
+    host.columns=cols
+    nodes = pd.concat([virus, host])
 
-	strain_color = {
-		'B.1.1.7': '#FF33EE',
-		'B.1.351': '#A033FF',
-		'B.1.427': '#33C2FF',
-		'B.1.525': '#33FFA7',
-		'B.1.526': '#33FF41',
-		'B.1.617': '#FFF933',
-		'B.1.617.2': '#FFA933',
-		'B.1.617.3': '#FF7833',
-		'B.1.621': '#000000',
-		'P.1': '#806C23',
-		'P.2': '#A30D5C',
-		'Reference': '#0D85A3'
-	}
-	strain_colors = []
+    strain_color = {
+        'B.1.1.7': '#FF33EE',
+        'B.1.351': '#A033FF',
+        'B.1.427': '#33C2FF',
+        'B.1.525': '#33FFA7',
+        'B.1.526': '#33FF41',
+        'B.1.617': '#FFF933',
+        'B.1.617.2': '#FFA933',
+        'B.1.617.3': '#FF7833',
+        'B.1.621': '#000000',
+        'P.1': '#806C23',
+        'P.2': '#A30D5C',
+        'Reference': '#0D85A3'
+    }
+    strain_colors = []
 
-	for k,v in strain_color.items():
-		strain_colors.append({'name': k, 'color': v})
+    for k,v in strain_color.items():
+        strain_colors.append({'name': k, 'color': v})
 
-	interactions = []
-	for index,row in df.iterrows():
-		virus = row['virus']
-		host = row['host']
-		interactions.append({'id': virus + "_" + host + "_" + strain_color[row['strain']], 'source': virus, 'target': host, 'color': strain_color[row['strain']], 'strain': row['strain']})
+    interactions = []
+    for index,row in df.iterrows():
+        virus = row['virus']
+        host = row['host']
+        interactions.append({'id': virus + "_" + host + "_" + strain_color[row['strain']], 'source': virus, 'target': host, 'color': strain_color[row['strain']], 'strain': row['strain']})
 
-	context['strain_colors'] = strain_colors
-	context['nodes'] = nodes.to_dict('records')
-	context['interactions'] = interactions
-	context['title'] = f'Network View - {Result.objects.get(pk=result_id).name}'
-	context['subtitle'] = Result.objects.get(pk=result_id).id
+    context['result_id'] = result_id
+    context['interaction_count'] = len(df[['virus', 'host']].drop_duplicates())
+    context['virus_count'] = len(set(df.virus.to_list()))
+    context['host_count'] = len(set(df.host.to_list()))
+    context['strain_colors'] = strain_colors
+    context['nodes'] = nodes.to_dict('records')
+    context['interactions'] = interactions
+    context['title'] = f'Network View - {Result.objects.get(pk=result_id).name}'
+    context['subtitle'] = Result.objects.get(pk=result_id).id
 
-	return render(request, 'network.html', context)
+    return render(request, 'network.html', context)
 
 def downloadFile(request, result_id):
 	context = {}

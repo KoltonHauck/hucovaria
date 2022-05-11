@@ -1,9 +1,14 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h1>{{ title }} Table</h1>
-<h6 class="muted">{{ subtitle }}</h6>
+<h1>{{ title }}</h1>
 <hr>
+
+<div class="container">
+    <a class="btn btn-primary" href="{% url 'main:network' result_id %}">To Network</a>
+    <a class="btn btn-primary" href="{{ file.url }}" download>To File</a>
+</div>
+
 
 <div class="container">
 	<div id="table-wrapper">
@@ -54,7 +59,7 @@
 	<div class="container pagination">
 		<span class="step-links">
 			{% if page_obj.has_previous %}
-				<a href="?page=1">&laquo; first</a>
+				<a href="?page=1"><i class="fa fa-arrow-circle-left"></i> first</a>
 				<a href="?page={{ page_obj.previous_page_number }}">previous</a>
 			{% endif %}
 
@@ -64,78 +69,9 @@
 
 			{% if page_obj.has_next %}
 				<a href="?page={{ page_obj.next_page_number }}">next</a>
-				<a href="?page={{ page_obj.paginator.num_pages }}">last &raquo;</a>
+				<a href="?page={{ page_obj.paginator.num_pages }}">last <i class="fa fa-arrow-circle-right"></i></a>
 			{% endif %}
 		</span>
-	</div>
-</div>
-<hr>
-<div class="container">
-<a class="btn btn-primary" href="{% url 'main:network' result_id %}">To Network</a>
-<a class="btn btn-primary" href="{{ file.url }}" download>To File</a>
-<!--<a type = "button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modal">Filter Table</a>-->
-</div>
-
-<div class="modal fade" id="modal" tabindex="-1">
-	<div class="modal-dialog">
-		<div class="modal-content">
-			<div class="modal-header">
-				<h5 class="modal-title" id="modalLabel">Filter Table</h5>
-				<button type="button" class="close" data-bs-dismiss="modal" aria-label="close">
-					<span>&times;</span>
-				</button>
-			</div>
-
-			<div class="modal-body">
-				<form action="#" method="get">
-					<div class="form-group">
-						<label for="filter-virus">Virus</label>
-						<input type="text" class="form-control" id="filter-virus" name="filter-virus" placeholder="Enter Virus IDs, comma separated">
-					</div>
-
-                    <div class="form-group">
-                        <label for="filter-host">Host</label>
-                        <input type="text" class="form-control" id="filter-host" name="filter-host" placeholder="Enter Host IDs, comma separated">
-                    </div>
-
-					<div class="form-group">
-						<label for="filter-strain">Strain</label>
-						<select class="form-select" multiple id="filter-strain" name="filter-strain">
-							<option>All</option>
-							<option>B.1.1.7</option>
-							<option>B.1.351</option>
-							<option>B.1.427</option>
-							<option>B.1.525</option>
-							<option>B.1.526</option>
-							<option>B.1.617</option>
-							<option>B.1.617.2</option>
-							<option>B.1.617.3</option>
-							<option>B.1.621</option>
-							<option>P.1</option>
-							<option>P.2</option>
-							<option>Reference</option>
-						</select>
-					</div>
-
-					<div class="form-group">
-						<label for="filter-interaction">Interaction Type</label>
-						<select class="form-select" id="filter-interaction" name="filter-interaction">
-							<option>Interolog</option>
-							<option>Domain</option>
-							<option>Both</option>
-						</select>
-					</div>
-
-					
-			</div>
-
-			<div class="modal-footer">
-				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-				<input type="submit" class="btn btn-primary" value="Filter">
-
-				</form>
-			</div>
-		</div>
 	</div>
 </div>
 

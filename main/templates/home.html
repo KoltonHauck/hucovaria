@@ -10,9 +10,9 @@
 
 				<!-- Host Strains Selection chunk -->				
 				<div class="col">
-					<h4>Human Proteins</h4>
+					<h4>Human Proteins <span data-toggle="tooltip" data-placement="top" title="Proteins must be comma separated"><i class="fa fa-question-circle"></i></span></h4>
 						<div class="form-group">
-							<textarea class="form-control" id="human_prots_text" name="human_prots_text" placeholder="Example: ACE2, ARF3, HLA-G, MARK3" rows="6"></textarea>
+							<textarea class="form-control" id="human_prots_text" name="human_prots_text" placeholder="Example: ACE2, ARF3, HLA-G, MARK3" rows="6" required></textarea>
 						</div>
 
 						<div class="btn-group">
@@ -25,10 +25,10 @@
 				<!-- Viral Strains Selection chunk -->
 				<div class="col">
 					<h4>SARS-CoV-2 Strains</h4>
-						<div id="sars_strains_div" class="">
+						<div id="sars_strains_div" class="strains_wrapper">
 						{% for strain in strains %}
 							<div class="form-check">
-								<input class="form-check-input" type="checkbox" value="1" id={{strain.name}} name={{strain.name}} checked>
+								<input class="form-check-input" type="checkbox" value="1" id={{strain.name}} name={{strain.name}} checked required>
 								<label class="form-check-label" for={{strain.name}}>{{strain.name}} ({{strain.label}})</label>
 							</div>
 						{% endfor %}
@@ -76,7 +76,7 @@
 					</div>
 
 					<!-- collapsable ontology menu -->
-					<div class="ontologyCollapse panel-collapse collapse">
+					<div class="ontologyCollapse panel-collapse">
 						{% for ontology in ontologies %}
 							<div class="form-check">
 								<input class="form-check-input" type="checkbox" name={{ontology}} value="1" id={{ontology}} checked>
@@ -88,7 +88,7 @@
 					<hr>
 
                     <!-- select interaction type -->
-					<h4>Interaction Type</h4>
+					<h4>Interaction Type <span data-toggle="tooltip" data-placement="top" title="Interolog: homology-based proteins|Domain: domain-based interactions|Combined: Both interolog and domain-based interactions"><i class="fa fa-question-circle"></i></span></h4>
 					<div>
 						<div class="form-check">
 							<input class="form-check-input" type="radio" name="interaction" id="interolog" value="Interolog">
@@ -115,13 +115,18 @@
 			<!-- submit button -->
 			<hr/>
 
+            <h4>Name of Your Query:</h4>
             <div class="form-group">
-                <textarea class="form-control" id="result_name" name="result_name" placeholder="Enter name for result (optional)"></textarea>
+                <textarea class="form-control" id="result_name" name="result_name" placeholder="{{ result_name }}"></textarea>
             </div>
 
 
 			<div class="container"><button type="submit" value="Submit" class="btn btn-primary">Submit Query</button></div>
 			</form>
+
+			<div class="modal fade" id="myModal">
+                test
+			</div>
 		</div>
 
 <script>
@@ -188,7 +193,7 @@ function getProteinSelection() {
 			})
 			.then(response => response)
 			.then(data => {
-				alert("Success, your query is complete and available in the results tab");
+				alert(`Success, your query is complete and available at: ${window.location.href}result/${document.querySelector("#result_name").value}`);
 			})
 			
 			.catch(error => {
@@ -285,6 +290,7 @@ function myFunct(selection) {
 		chips.appendChild(newChip);
 	}
 }
+
 </script>
 
 {% endblock content %}
