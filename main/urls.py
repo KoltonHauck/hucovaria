@@ -11,7 +11,6 @@ urlpatterns = [
 	path('results/', views.ResultsView.as_view(), name='results'),
 	path('results/<str:result_id>/table/', views.TableView.as_view(), name='table'),
 	path('results/<str:result_id>/network/', views.network, name='network'),
-	path('result/<str:result_id>/download_csv/', views.downloadFile, name='download_csv'),
 ]
 
 #urlpatterns = []

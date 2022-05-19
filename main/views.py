@@ -35,6 +35,7 @@ def home(request):
 		'ontologies': ['MF', 'BP', 'CC'],
 		'result_name': str(uuid4())[:18],
 	}
+	checkResults()
 	return render(request, 'home.html', context)
 
 def about(request):
@@ -81,8 +82,7 @@ def makeQuery(request):
     newID = request.POST.get('result_name')
     name = request.POST.get('result_name')
 
-    #filename=f'media/{newID}.csv'
-    #file = f'{newID}.csv'
+    filename=f'media/{newID}.csv'
 
     newResult = Result(id=newID, time=timezone.now(), annotation=annotation, name=name)
     newResult.save()
@@ -114,23 +114,22 @@ def makeQuery(request):
         newInteractionResult.save()
 
     Interaction_qs = getInteractionQuerySet(newResult.id)
-    #df = pd.DataFrame(Interaction_qs.values())
-    #df.to_csv(filename, index=None)
-    #newResult.file = file
+    df = pd.DataFrame(Interaction_qs.values())
+    df.to_csv(filename, index=None)
     newResult.save()
 
     return HttpResponseRedirect(reverse('main:home'))
 
+def checkResults():
+    for result in Result.objects.all():
+        diff = timezone.now() - result.time
+        if diff.days > 7:
+            os.remove('.' + result.file.url)
+            result.delete()
+
 class ResultsView(generic.ListView):
 	template_name = 'results.html'
 	context_object_name = 'results'
-
-	for result in Result.objects.all():
-		diff = timezone.now() - result.time
-		if diff.days > 7:
-			os.remove('.' + result.file.url)
-			result.delete()
-
 
 	def get_queryset(self):
 		return Result.objects.all().reverse()
@@ -191,7 +190,6 @@ class TableView(generic.ListView):
 		context['title'] = f'Table View - {Result.objects.get(pk=result_id).name}'
 		context['subtitle'] = Result.objects.get(pk=result_id).id
 		context['result_id'] = result_id
-		context['file'] = Result.objects.get(pk=result_id).file
 		return context
 
 def network(request, result_id):
@@ -243,8 +241,3 @@ def network(request, result_id):
     context['subtitle'] = Result.objects.get(pk=result_id).id
 
     return render(request, 'network.html', context)
-
-def downloadFile(request, result_id):
-	context = {}
-	file = Result.objects.get(pk=result_id).file
-	return render(request, file.url, context)
