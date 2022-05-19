@@ -127,13 +127,6 @@ def checkResults():
             os.remove('.' + result.file.url)
             result.delete()
 
-class ResultsView(generic.ListView):
-	template_name = 'results.html'
-	context_object_name = 'results'
-
-	def get_queryset(self):
-		return Result.objects.all().reverse()
-
 class TableView(generic.ListView):
 	template_name = 'table.html'
 	context_object_name = 'query'
