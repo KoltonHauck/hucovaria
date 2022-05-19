@@ -97,7 +97,7 @@ def makeQuery(request):
 	#add AnnotationResults
     if annotation == 'KEGG':
         pass
-    elif annotation == 'Gene_Ontology':
+    elif annotation == 'Gene Ontology':
         pass
 
 	#add HostResults
@@ -142,7 +142,66 @@ class ResultsView(generic.ListView):
 	def get_queryset(self):
 		return Result.objects.all().reverse()
 
+class TableView(generic.ListView):
+	template_name = 'table.html'
+	context_object_name = 'query'
 
+	def get_queryset(self):
+		result_id = self.request.META['PATH_INFO'].split('/')[3]
+		annotation = Result.objects.get(pk=result_id).annotation
+		qs = getInteractionQuerySet(result_id)
+		qs_l = qs.values()
+		new = []
+		if annotation == 'Gene Ontology':
+			for row in qs_l:
+				go = GO.objects.filter(gene=row['host'])
+				if len(go) != 0:
+					for g in go:
+						newrow = row.copy()
+						newrow['GO'] = g.name
+						newrow['GO_Description'] = g.description
+						newrow['GO_Type'] = g.type
+						new.append(newrow)
+				else:
+					newrow = row.copy()
+					new.append(newrow)
+			return new
+		elif annotation == 'KEGG':
+			for row in qs_l:
+				kegg = KEGG.objects.filter(gene=row['host'])
+				if len(kegg) != 0:
+					for k in kegg:
+						newrow = row.copy()
+						newrow['KEGG'] = k.name
+						newrow['KEGG_Description'] = k.description
+						new.append(newrow)
+				else:
+					newrow = row.copy()
+					new.append(newrow)
+			return new
+
+		return qs_l
+
+	def get_context_data(self, **kwargs):
+		result_id = self.request.META['PATH_INFO'].split('/')[3]
+		context = super().get_context_data(**kwargs)
+		annotation = Result.objects.get(pk=result_id).annotation
+		context['annotation'] = {'annotation': annotation}
+		if annotation == 'KEGG':
+		    context['annotation']['pprint'] = 'KEGG'
+		elif annotation == 'Gene Ontology':
+		    context['annotation']['pprint'] = 'Gene Ontology'
+		elif annotation == 'localization':
+		    context['annotation']['pprint'] = 'Localization'
+		elif annotation == 'tissue_expression':
+		    context['annotation']['pprint'] = 'Tissue Expression'
+		context['title'] = f'Table View - {Result.objects.get(pk=result_id).name}'
+		context['subtitle'] = Result.objects.get(pk=result_id).id
+		context['result_id'] = result_id
+		context['file'] = Result.objects.get(pk=result_id).file
+		return context
+
+'''
 class TableView(generic.ListView):
 	template_name = 'table.html'
 	context_object_name = 'query'
@@ -154,7 +213,7 @@ class TableView(generic.ListView):
 		qs = getInteractionQuerySet(result_id)
 		qs_l = qs.values()
 		new = []
-		if annotation == 'Gene_Ontology':
+		if annotation == 'Gene Ontology':
 			for row in qs_l:
 				go = GO.objects.filter(gene=row['host'])
 				if len(go) != 0:
@@ -194,6 +253,8 @@ class TableView(generic.ListView):
 		context['result_id'] = result_id
 		context['file'] = Result.objects.get(pk=result_id).file
 		return context
+'''
+
 
 def network(request, result_id):
     context = {}

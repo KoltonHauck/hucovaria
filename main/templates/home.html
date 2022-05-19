@@ -71,8 +71,8 @@
 					{% endfor %}
 
 					<div class="form-check">
-						<input class="form-check-input" type="radio" name="Annotation" id="Gene_Ontology" value="Gene_Ontology" data-toggle="collapse" data-target=".ontologyCollapse:not(.show)" checked>
-						<label class="form-check-label" for="Gene_Ontology">Gene Ontology</label>
+						<input class="form-check-input" type="radio" name="Annotation" id="Gene Ontology" value="Gene Ontology" data-toggle="collapse" data-target=".ontologyCollapse:not(.show)" checked>
+						<label class="form-check-label" for="Gene Ontology">Gene Ontology</label>
 					</div>
 
 					<!-- collapsable ontology menu -->
@@ -175,7 +175,7 @@ function getProteinSelection() {
             console.log("added annotations");
 
             //GO
-            formData.append("Gene_Ontology", document.getElementById("Gene_Ontology").value);
+            formData.append("Gene Ontology", document.getElementById("Gene Ontology").value);
             console.log("added GO");
 
             //result_name

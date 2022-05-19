@@ -2,6 +2,7 @@ from django.urls import path
 from . import views
 
 app_name = 'main'
+
 urlpatterns = [
 	path('', views.home, name='home'),
 	path('about/', views.about, name='about'),
@@ -12,3 +13,5 @@ urlpatterns = [
 	path('results/<str:result_id>/network/', views.network, name='network'),
 	path('result/<str:result_id>/download_csv/', views.downloadFile, name='download_csv'),
 ]
+
+#urlpatterns = []

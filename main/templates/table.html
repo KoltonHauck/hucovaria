@@ -1,53 +1,51 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block content %}
-<h1>{{ title }}</h1>
+<h1>{{ title }} | <a class="btn btn-primary" href="{% url 'main:network' result_id %}">To Network View</a></h1>
 <hr>
 
-<div class="container">
-    <a class="btn btn-primary" href="{% url 'main:network' result_id %}">To Network</a>
-    <a class="btn btn-primary" href="{{ file.url }}" download>To File</a>
+<div id="loading">
+    <img src="{% static 'main/loading.gif' %}" />
 </div>
 
-
 <div class="container">
-	<div id="table-wrapper">
-		<table class="table table-dark table-bordered table-hover">
+	<div id="table-wrapper" hidden>
+		<table class="display" id="table">
 			<thead>
 				<tr>
 					<th scope="col">#</th>
-					<!--<th scope="col"><a href="?order_by=virus">V Gene</a></th>-->
 					<th scope="col">V Gene</th>
 					<th scope="col">H Gene</th>
 					<th scope="col">Strain</th>
 					<th scope="col">Interaction Type</th>
-					<th scope="col">{{ annotation }}</th>
-					{% if annotation == "Gene_Ontology" %}
+					<th scope="col">{{ annotation.pprint }}</th>
+					{% if annotation.annotation == "Gene Ontology" %}
 					<th scope="col">Ontology Type</th>
 					<th scope="col">Ontology Description</th>
-					{% elif annotation == "KEGG" %}
+					{% elif annotation.annotation == "KEGG" %}
 					<th scope="col">Pathway Description</th>
 					{% endif %}
 				</tr>
 			</thead>
 			<tbody id="table-body">
-				{% for line in page_obj %}
+				{% for line in query %}
 						<tr>
-						<th scope="row">{{ page_obj.start_index|add:forloop.counter0 }}</th>
+						<th scope="row">{{ forloop.counter }}</th>
 						<td>{{ line.virus }}</td>
 						<td><a href="https://www.ncbi.nlm.nih.gov/search/all/?term={{ line.host }}" target="_blank" rel="noopener noreferrer">{{ line.host }}</a></td>
 						<td>{{ line.strain }}</td>
 						<td>{{ line.interaction }}</td>
-					{% if annotation == "KEGG" %}
+					{% if annotation.annotation == "KEGG" %}
 						<td><a href="https://www.genome.jp/pathway/{{ line.KEGG }}" target="_blank" rel="noopener noreferrer">{{ line.KEGG }}</a></td>
 						<td>{{ line.KEGG_Description }}</td>
-					{% elif annotation == "Gene_Ontology" %}
+					{% elif annotation.annotation == "Gene Ontology" %}
 						<td><a href="http://amigo.geneontology.org/amigo/term/{{line.GO}}" target="_blank" rel="noopener noreferrer">{{ line.GO }}</a></td>
 						<td>{{ line.GO_Type }}</td>
 						<td>{{ line.GO_Description }}</td>
-					{% elif annotation == "localization" %}
+					{% elif annotation.annotation == "localization" %}
 						<td>{{ line.localization }}</td>
-					{% elif annotation == "tissue_expression" %}
+					{% elif annotation.annotation == "tissue_expression" %}
 						<td><a href="https://gtexportal.org/home/gene/{{ line.host }}" target="_blank" rel="noopener noreferrer">{{ line.tissue_expression }}</a></td>
 					{% endif %}
 				</tr>
@@ -56,23 +54,18 @@
 			</tbody>
 		</table>
 	</div>
-	<div class="container pagination">
-		<span class="step-links">
-			{% if page_obj.has_previous %}
-				<a href="?page=1"><i class="fa fa-arrow-circle-left"></i> first</a>
-				<a href="?page={{ page_obj.previous_page_number }}">previous</a>
-			{% endif %}
-
-			<span class="current">
-				Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
-			</span>
-
-			{% if page_obj.has_next %}
-				<a href="?page={{ page_obj.next_page_number }}">next</a>
-				<a href="?page={{ page_obj.paginator.num_pages }}">last <i class="fa fa-arrow-circle-right"></i></a>
-			{% endif %}
-		</span>
-	</div>
 </div>
+
+<script>
+
+var table = $("#table").DataTable({
+    dom: "Bfrtip",
+    buttons: ["excel", "csv"]
+});
+
+document.getElementById("loading").hidden = true;
+document.getElementById("table-wrapper").hidden = false;
+
+</script>
 
 {% endblock content %}
