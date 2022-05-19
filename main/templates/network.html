@@ -3,18 +3,20 @@
 
 
 {% block content %}
-	<h1>{{ title }}</h1>
+	<h1>{{ title }} | <a class="btn btn-primary" href="{% url 'main:table' result_id %}">To Table View</a></h1>
 	<hr>
 <div class="container">
 	<div class="row">
         <div>
-            <span>
-                #Virus Proteins: {{ virus_count }}
-                | #Host Proteins: {{ host_count }}
-                | #Interactions: {{ interaction_count }}
-            </span>
-            <p>Right click &amp; hold on nodes for external links</p>
-            <p><a class="btn btn-primary" href="{% url 'main:table' result_id %}">To Table</a></p>
+            <ul>
+                <li>
+                    #Virus Proteins: {{ virus_count }}
+                    | #Host Proteins: {{ host_count }}
+                    | #Interactions: {{ interaction_count }}
+                </li>
+                <li>Right click &amp; hold on nodes for external links</li>
+                <li>Hold ctrl and click on nodes for multi-select</li>
+            </ul>
         </div>
 	
 		<div id="cy-wrapper" class="col-sm-9">

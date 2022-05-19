@@ -6,6 +6,16 @@
     font-size: 15px;
 }
 
+.fa-check-circle {
+    font-size: 15px;
+    color: green;
+}
+
+.fa-spinner {
+    font-size: 15px;
+    color: red;
+}
+
 .#000000 {
     color: white;
 }

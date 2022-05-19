@@ -33,7 +33,7 @@ def home(request):
 					],
 		'annotations': [{'name': 'tissue_expression', 'pprint': 'Tissue Expression'}, {'name': 'localization', 'pprint': 'Localization'}, {'name': 'KEGG', 'pprint': 'KEGG'}],
 		'ontologies': ['MF', 'BP', 'CC'],
-		'result_name': str(uuid4()),
+		'result_name': str(uuid4())[:18],
 	}
 	return render(request, 'home.html', context)
 
@@ -75,15 +75,15 @@ def makeQuery(request):
 		'Reference']
 
 	#add to Result
-    newID = str(uuid4())
-
-    filename=f'media/{newID}.csv'
-    file = f'{newID}.csv'
     annotation = request.POST.get('Annotation')
-    if request.POST.get('result_name') == '':
-        name = timezone.now()
-    else:
-        name = request.POST.get('result_name')
+    print(request.POST.get('result_name'))
+
+    newID = request.POST.get('result_name')
+    name = request.POST.get('result_name')
+
+    #filename=f'media/{newID}.csv'
+    #file = f'{newID}.csv'
+
     newResult = Result(id=newID, time=timezone.now(), annotation=annotation, name=name)
     newResult.save()
 
@@ -94,17 +94,10 @@ def makeQuery(request):
             newStrainResult = StrainResult(result=newResult, content=strain)
             newStrainResult.save()
 
-	#add AnnotationResults
-    if annotation == 'KEGG':
-        pass
-    elif annotation == 'Gene Ontology':
-        pass
-
 	#add HostResults
     for h in request.POST.get('human_prots_text').split(','):
         newHostResult = HostResult(result=newResult, content=h)
         newHostResult.save()
-
 
 	#add VirusResults
     for v in request.POST.get('hidden_sars_prots').split(','):
@@ -121,9 +114,9 @@ def makeQuery(request):
         newInteractionResult.save()
 
     Interaction_qs = getInteractionQuerySet(newResult.id)
-    df = pd.DataFrame(Interaction_qs.values())
-    df.to_csv(filename, index=None)
-    newResult.file = file
+    #df = pd.DataFrame(Interaction_qs.values())
+    #df.to_csv(filename, index=None)
+    #newResult.file = file
     newResult.save()
 
     return HttpResponseRedirect(reverse('main:home'))
@@ -200,61 +193,6 @@ class TableView(generic.ListView):
 		context['result_id'] = result_id
 		context['file'] = Result.objects.get(pk=result_id).file
 		return context
-
-'''
-class TableView(generic.ListView):
-	template_name = 'table.html'
-	context_object_name = 'query'
-	paginate_by = 100
-
-	def get_queryset(self):
-		result_id = self.request.META['PATH_INFO'].split('/')[3]
-		annotation = Result.objects.get(pk=result_id).annotation
-		qs = getInteractionQuerySet(result_id)
-		qs_l = qs.values()
-		new = []
-		if annotation == 'Gene Ontology':
-			for row in qs_l:
-				go = GO.objects.filter(gene=row['host'])
-				if len(go) != 0:
-					for g in go:
-						newrow = row.copy()
-						newrow['GO'] = g.name
-						newrow['GO_Description'] = g.description
-						newrow['GO_Type'] = g.type
-						new.append(newrow)
-				else:
-					newrow = row.copy()
-					new.append(newrow)
-			return new
-		elif annotation == 'KEGG':
-			for row in qs_l:
-				kegg = KEGG.objects.filter(gene=row['host'])
-				if len(kegg) != 0:
-					for k in kegg:
-						newrow = row.copy()
-						newrow['KEGG'] = k.name
-						newrow['KEGG_Description'] = k.description
-						new.append(newrow)
-				else:
-					newrow = row.copy()
-					new.append(newrow)
-			return new
-
-		return qs_l
-
-	def get_context_data(self, **kwargs):
-		result_id = self.request.META['PATH_INFO'].split('/')[3]
-		context = super().get_context_data(**kwargs)
-		annotation = Result.objects.get(pk=result_id).annotation
-		context['annotation'] = annotation
-		context['title'] = f'Table View - {Result.objects.get(pk=result_id).name}'
-		context['subtitle'] = Result.objects.get(pk=result_id).id
-		context['result_id'] = result_id
-		context['file'] = Result.objects.get(pk=result_id).file
-		return context
-'''
-
 
 def network(request, result_id):
     context = {}
