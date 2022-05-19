@@ -1,19 +1,29 @@
-#loading {
-    justify-content: center;
-}
-
-.fa-question-circle {
-    font-size: 15px;
-}
-
 .fa-check-circle {
-    font-size: 15px;
     color: green;
 }
 
 .fa-spinner {
-    font-size: 15px;
     color: red;
+    animation-name: spin;
+    animation-duration: 4500ms;
+    animation-iteraction-count: infinite;
+}
+
+.large {
+    font-size: 50px;
+}
+
+.small {
+    font-size: 15px;
+}
+
+@keyframes spin{
+    from {
+        transform:rotate(0deg);
+    }
+    to {
+        transform:rotate(360deg);
+    }
 }
 
 .#000000 {
