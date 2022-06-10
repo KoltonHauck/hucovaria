@@ -12,11 +12,11 @@
 				<div class="col">
 					<h4>Human Proteins <span data-toggle="tooltip" data-placement="top" title="Proteins must be comma separated"><i class="fa fa-question-circle small"></i></span></h4>
 						<div class="form-group">
-							<textarea class="form-control" id="human_prots_text" name="human_prots_text" placeholder="Example: ACE2, ARF3, HLA-G, MARK3" rows="6" required></textarea>
+							<textarea class="form-control" id="human_prots_text" name="human_prots_text" placeholder="Example: VAMP4, MOGS, RETSAT, DOK, SCD, SLIT3, DARS2" rows="6" required></textarea>
 						</div>
 
 						<div class="btn-group">
-							<button type="button" class="btn btn-primary" onclick="document.getElementById('human_prots_text').value='ACE2,ARF3,HLA-G,MARK3';">Sample</button>
+							<button type="button" class="btn btn-primary" onclick="document.getElementById('human_prots_text').value='VAMP4, MOGS, RETSAT, DOK, SCD, SLIT3, DARS2';">Sample</button>
 							<button type="button" class="btn btn-secondary" onclick="document.getElementById('human_prots_text').value = '';">Clear</button>
 						</div><br>
 
@@ -130,10 +130,11 @@
                     <div class="modal-content">
                         <div class="modal-header">
                             <h5 class="modal-title">Your Query Has Been Submitted!</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" onclick=location.reload()></button>
                         </div>
                         <div class="modal-body">
-                            Your results will be available at the following link when ready: <a href="{% url 'main:table' result_name %}">{{ result_name }}</a><span id="result-link"></span>
+                            <p>Your results will be available at the following link when ready: <a href="{% url 'main:table' result_name %}">{{ result_name }}</a><span id="result-link"></span></p>
+                            <p><small>Please click the 'X' or refresh page to submit another query</small></p>
                         </div>
                         <div class="modal-footer">
                             <span id="status-not-done">Status: not done <i class="fa fa-spinner small"></i></span>
@@ -147,9 +148,12 @@
 <script>
 var result_name = "{{result_name}}";
 console.log(result_name);
-//var link = `${window.location.href}results/{{ result_name }}/table/`;
-//console.log(link);
-//document.getElementById("result-link").innerHTML = "<a href=`${link}`>{{ result_name }}</a>";
+
+function uuidv4() {
+    return ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, c =>
+        (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
+    );
+}
 </script>
 
 <script>
@@ -206,10 +210,9 @@ function getProteinSelection() {
             console.log("added result_name");
 
             //csrf token
-            formData.append("csrfmiddlewaretoken", '{{ csrf_token }}');
+            formData.append("csrfmiddlewaretoken", "{{ csrf_token }}");
             console.log("add csrf token");
             
-            //alert("Your query has been submitted");            
 			fetch("{% url 'main:query' %}", {
 				method: 'POST',
 				body: formData
@@ -218,7 +221,6 @@ function getProteinSelection() {
 			.then(data => {
 			    document.getElementById("status-not-done").hidden = true;
 			    document.getElementById("status-done").hidden = false;
-				//alert(`Success, your query is complete and available at: ${window.location.href}result/{{ result_name }}`);
 			})			
 			.catch(error => {
                 alert(`error: ${error}`);

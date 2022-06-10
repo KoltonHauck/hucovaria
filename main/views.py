@@ -81,7 +81,6 @@ def makeQuery(request):
 
     newID = request.POST.get('result_name')
     name = request.POST.get('result_name')
-
     filename=f'media/{newID}.csv'
 
     newResult = Result(id=newID, time=timezone.now(), annotation=annotation, name=name)
@@ -96,7 +95,8 @@ def makeQuery(request):
 
 	#add HostResults
     for h in request.POST.get('human_prots_text').split(','):
-        newHostResult = HostResult(result=newResult, content=h)
+        host_gene = h.strip()
+        newHostResult = HostResult(result=newResult, content=host_gene)
         newHostResult.save()
 
 	#add VirusResults
@@ -124,7 +124,8 @@ def checkResults():
     for result in Result.objects.all():
         diff = timezone.now() - result.time
         if diff.days > 7:
-            os.remove('.' + result.file.url)
+            file_path = f'/media/{result.id}.csv'
+            os.remove(f'./media/{result.id}.csv')
             result.delete()
 
 class TableView(generic.ListView):
@@ -180,7 +181,7 @@ class TableView(generic.ListView):
 		    context['annotation']['pprint'] = 'Localization'
 		elif annotation == 'tissue_expression':
 		    context['annotation']['pprint'] = 'Tissue Expression'
-		context['title'] = f'Table View - {Result.objects.get(pk=result_id).name}'
+		context['title'] = f'Table View - {Result.objects.get(pk=result_id).id}'
 		context['subtitle'] = Result.objects.get(pk=result_id).id
 		context['result_id'] = result_id
 		return context
@@ -230,7 +231,7 @@ def network(request, result_id):
     context['strain_colors'] = strain_colors
     context['nodes'] = nodes.to_dict('records')
     context['interactions'] = interactions
-    context['title'] = f'Network View - {Result.objects.get(pk=result_id).name}'
+    context['title'] = f'Network View - {Result.objects.get(pk=result_id).id}'
     context['subtitle'] = Result.objects.get(pk=result_id).id
 
     return render(request, 'network.html', context)
