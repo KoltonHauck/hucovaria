@@ -43,7 +43,7 @@
 				<div class="col">
 					<h4>SARS-CoV-2 Proteins</h4>
 						<div class="form-group">
-							<select multiple size="6" class="form-control" name="sars_proteins" id="sars_proteins">
+							<select multiple size="6" class="form-control" name="sars_proteins" id="sars_proteins" required>
 								{% for prot in virusProteins %}
 									<option onclick="myFunct(this)" id="select_{{prot}}">{{prot}}</option>
 								{% endfor %}
@@ -71,18 +71,20 @@
 					{% endfor %}
 
 					<div class="form-check">
-						<input class="form-check-input" type="radio" name="Annotation" id="Gene Ontology" value="Gene Ontology" data-toggle="collapse" data-target=".ontologyCollapse:not(.show)" checked>
+						<input class="form-check-input" type="radio" name="Annotation" id="Gene Ontology" value="Gene Ontology" data-toggle="collapse" data-target=".ontologyCollapse" checked>
 						<label class="form-check-label" for="Gene Ontology">Gene Ontology</label>
 					</div>
 
 					<!-- collapsable ontology menu -->
-					<div class="ontologyCollapse panel-collapse">
+					<div class="ontologyCollapse collapse">
+					<ul>
 						{% for ontology in ontologies %}
-							<div class="form-check">
-								<input class="form-check-input" type="checkbox" name={{ontology}} value="1" id={{ontology}} checked>
+							<li><div class="form-check">
+								<input class="form-check-input" type="checkbox" name={{ontology}} value="1" id={{ontology}} checked disabled>
 								<label class="form-check-label" for={{ontology}}>{{ontology}}</label>
-							</div>
+							</div></li>
 						{% endfor %}
+				    </ul>
 					</div>
 
 					<hr>
@@ -109,10 +111,9 @@
 				</div>
 			</div>
 			<div>
-				<input type="hidden" id="hidden_sars_prots" name="hidden_sars_prots" value="">
+				<input type="hidden" id="hidden_sars_prots" name="hidden_sars_prots" value="" required>
 			</div>
 
-			<!-- submit button -->
 			<hr/>
 
 <!--
@@ -121,10 +122,12 @@
                 <textarea class="form-control" id="result_name" name="result_name" placeholder="{{ result_name }}" value="{{ result_name }}"></textarea>
             </div>
 -->
-
-			<div class="container"><button type="submit" value="Submit" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#myModal">Submit Query</button></div>
+			<!-- submit button -->
+			<div class="container"><button type="submit" value="Submit" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#myModal" id="modal_button" hidden>Display Modal</button></div>
+			<div class="container"><button class="btn btn-primary" onclick="checkViralProts();">Submit Query</button></div>
 			</form>
 
+            <!-- query submission modal -->
 			<div class="modal fade" id="myModal">
 			    <div class="modal-dialog">
                     <div class="modal-content">
@@ -145,18 +148,20 @@
 			</div>
 		</div>
 
-<script>
+<script type="text/javascript">
+//create var with result_name
 var result_name = "{{result_name}}";
-console.log(result_name);
 
+document.getElementById("KEGG").checked = true;
+
+//generate random #
 function uuidv4() {
     return ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, c =>
         (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
     );
 }
-</script>
 
-<script>
+//get the viral proteins selected
 function getProteinSelection() {
 	ancestor = document.getElementById("chips");
 	descendants = ancestor.getElementsByTagName("div");
@@ -165,69 +170,68 @@ function getProteinSelection() {
 		myArr.push(descendants[i].id);
 	}
 	document.getElementById("hidden_sars_prots").value = myArr;
-	console.log("ran getProteinSelection()");
 }
-</script>
 
-<script type="text/javascript">
-	document.getElementById("myform").addEventListener("submit", 
-		function(e) {
-			e.preventDefault();
+function checkViralProts() {
+        let numViralProts = document.getElementById("chips").getElementsByTagName("div").length;
+        if (numViralProts != 0) {
+            document.getElementById("sars_proteins").required = false;
+            document.getElementById("modal_button").click();
+        }
+}
 
-			let formData = new FormData();
+//submit button => add formdata
+document.getElementById("myform").addEventListener("submit", 
+	function(e) {
+		e.preventDefault();
 
-            //human proteins
-			formData.append("human_prots_text", document.querySelector("#human_prots_text").value);
-			console.log("added human_prots_text");
+		let formData = new FormData();
 
-			//virus proteins
-			getProteinSelection();
-			formData.append('hidden_sars_prots', document.querySelector("#hidden_sars_prots").value);
-			console.log("added hidden_sars_prots");
+        //human proteins
+		formData.append("human_prots_text", document.querySelector("#human_prots_text").value);
 
-            //strains
-			{% for strain in strains %}
-			    formData.append("{{ strain.name }}", document.getElementById("{{ strain.name }}").value);
-			{% endfor %}
-			console.log("added strains");
+		//virus proteins
+		getProteinSelection();
+		formData.append("hidden_sars_prots", document.querySelector("#hidden_sars_prots").value);
 
-            //ontologies
-			{% for ontology in ontologies %}
-				formData.append("{{ ontology }}", document.getElementById("{{ ontology }}").value);
-			{% endfor %}
-			console.log("added ontologies");
+        //strains
+		{% for strain in strains %}
+		    formData.append("{{ strain.name }}", document.getElementById("{{ strain.name }}").value);
+		{% endfor %}
 
-            //annotations
-		    formData.append("Annotation", document.querySelector('input[name="Annotation"]:checked').value);
-            console.log("added annotations");
+        //ontologies
+		{% for ontology in ontologies %}
+			formData.append("{{ ontology }}", document.getElementById("{{ ontology }}").value);
+		{% endfor %}
 
-            //GO
-            formData.append("Gene Ontology", document.getElementById("Gene Ontology").value);
-            console.log("added GO");
+        //annotations
+	    formData.append("Annotation", document.querySelector('input[name="Annotation"]:checked').value);
 
-            //result_name
-            formData.append("result_name", "{{result_name}}");
-            console.log("added result_name");
+        //GO
+        formData.append("Gene Ontology", document.getElementById("Gene Ontology").value);
 
-            //csrf token
-            formData.append("csrfmiddlewaretoken", "{{ csrf_token }}");
-            console.log("add csrf token");
-            
-			fetch("{% url 'main:query' %}", {
-				method: 'POST',
-				body: formData
-			})
-			.then(response => response)
-			.then(data => {
-			    document.getElementById("status-not-done").hidden = true;
-			    document.getElementById("status-done").hidden = false;
-			})			
-			.catch(error => {
-                alert(`error: ${error}`);
-                console.log(error);
-			});
+        //result_name
+        formData.append("result_name", "{{result_name}}");
+
+        //csrf token
+        formData.append("csrfmiddlewaretoken", "{{ csrf_token }}");
+        
+		fetch("{% url 'main:query' %}", {
+			method: 'POST',
+			body: formData
+		})
+		.then(response => response)
+		.then(data => {
+		    document.getElementById("status-not-done").hidden = true;
+		    document.getElementById("status-done").hidden = false;
+		})			
+		.catch(error => {
+            alert(`error: ${error}`);
+            console.log(error);
+		});
 });
 
+//strains clear/select all button
 function selectOrClearAllStrains() {
 	const button = document.getElementById("sars_strains_button");
 
@@ -251,6 +255,7 @@ function selectOrClearAllStrains() {
 	}
 }
 
+//viral proteins clear/select all button
 function selectOrClearAll() {
 	const button = document.getElementById("sars_proteins_button");
 
@@ -292,6 +297,7 @@ function selectOrClearAll() {
 
 }
 
+//generate chips function
 function myFunct(selection) {
 	if (typeof(selection) === "object") {
 		selection = selection.value;
@@ -316,7 +322,6 @@ function myFunct(selection) {
 		chips.appendChild(newChip);
 	}
 }
-
 </script>
 
 {% endblock content %}

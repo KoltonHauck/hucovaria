@@ -44,6 +44,12 @@ def about(request):
 	}
 	return render(request, 'about.html', context)
 
+def help(request):
+    context = {
+        'title': 'Help',
+    }
+    return render(request, 'help.html', context)
+
 def datasets(request):
 	context = {
 		'title': 'Datasets',
