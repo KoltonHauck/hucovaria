@@ -36,9 +36,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.CharField(max_length=60, primary_key=True, serialize=False)),
                 ('time', models.DateTimeField()),
-                ('file', models.FileField(upload_to='')),
                 ('annotation', models.CharField(max_length=60)),
-                ('name', models.CharField(max_length=100)),
             ],
         ),
         migrations.CreateModel(

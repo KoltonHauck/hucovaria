@@ -77,13 +77,11 @@ def makeQuery(request):
 
 	#add to Result
     annotation = request.POST.get('Annotation')
-    print(request.POST.get('result_name'))
 
     newID = request.POST.get('result_name')
-    name = request.POST.get('result_name')
     filename=f'media/{newID}.csv'
 
-    newResult = Result(id=newID, time=timezone.now(), annotation=annotation, name=name)
+    newResult = Result(id=newID, time=timezone.now(), annotation=annotation)
     newResult.save()
 
 	#add StrainResults
