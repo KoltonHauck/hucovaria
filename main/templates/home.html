@@ -123,8 +123,9 @@
 
 			<!-- submit button -->
 			<div class="container"><button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#myModal" id="modal_button" hidden>Display Modal</button></div>
-			<div class="container"><button class="btn btn-primary" onclick="checkViralProts();">Submit Query</button></div>
 			</form>
+
+			<div class="container"><button class="btn btn-primary" onclick="checkViralProts();">Submit Query</button></div>
 
             <!-- query submission modal -->
 			<div class="modal fade" id="myModal" data-bs-keyboard="false" data-bs-backdrop="static">
@@ -152,13 +153,6 @@
 var result_name = "{{result_name}}";
 
 document.getElementById("KEGG").checked = true;
-
-
-//document.getElementById("myModal").on('hidden', 
-//   function () {
-//        location.reload();
-//    }
-//);
 
 //generate random #
 function uuidv4() {
@@ -225,7 +219,7 @@ document.getElementById("myform").addEventListener("submit",
 
         //csrf token
         formData.append("csrfmiddlewaretoken", "{{ csrf_token }}");
-        
+
 		fetch("{% url 'main:query' %}", {
 			method: 'POST',
 			body: formData
