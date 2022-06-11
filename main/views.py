@@ -4,6 +4,8 @@ from django.views import generic
 from django.urls import reverse
 from django.utils import timezone
 from uuid import uuid4
+from django.core.mail import send_mail
+from django.conf import settings
 import os
 import pandas as pd
 import mimetypes
@@ -121,6 +123,18 @@ def makeQuery(request):
     df = pd.DataFrame(Interaction_qs.values())
     df.to_csv(filename, index=None)
     newResult.save()
+
+    #send email if given
+
+    print(request.POST.get('email'))
+    print(request.POST.get('link'))
+    if request.POST.get('email'):
+        send_mail(
+            f'HuCoVaria results for {newID}',
+            f'Thank you for using HuCoVaria! Here is the link to your results: {request.POST.get("link")}',
+            settings.EMAIL_HOST_USER,
+            [request.POST.get('email')],
+        )
 
     return HttpResponseRedirect(reverse('main:home'))
 

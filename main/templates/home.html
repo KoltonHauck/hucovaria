@@ -51,7 +51,7 @@
 						</div>
 
 						<div class="btn-group">
-							<button id="sars_proteins_button" type="button" class="btn btn-primary" onclick="selectOrClearAll();">Select All</button>
+							<button id="sars_proteins_button" type="button" class="btn btn-primary" onclick="selectOrClearAll()">Select All</button>
 						</div>
 
 					<div id="chips">
@@ -114,29 +114,28 @@
 				<input type="hidden" id="hidden_sars_prots" name="hidden_sars_prots" value="" required>
 			</div>
 
-			<hr/>
-
-<!--
-            <h4>E-mail to be informed:</h4>
             <div class="form-group">
-                <textarea class="form-control" id="result_name" name="result_name" placeholder="{{ result_name }}" value="{{ result_name }}"></textarea>
+                <label for="email">Enter Email (optional)</label>
+                <input type="email" class="form-control" id="email" placeholder="Enter email for notification when query is finished">
             </div>
--->
+
+            <hr>
+
 			<!-- submit button -->
-			<div class="container"><button type="submit" value="Submit" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#myModal" id="modal_button" hidden>Display Modal</button></div>
+			<div class="container"><button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#myModal" id="modal_button" hidden>Display Modal</button></div>
 			<div class="container"><button class="btn btn-primary" onclick="checkViralProts();">Submit Query</button></div>
 			</form>
 
             <!-- query submission modal -->
-			<div class="modal fade" id="myModal">
+			<div class="modal fade" id="myModal" data-bs-keyboard="false" data-bs-backdrop="static">
 			    <div class="modal-dialog">
                     <div class="modal-content">
                         <div class="modal-header">
                             <h5 class="modal-title">Your Query Has Been Submitted!</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" onclick=location.reload()></button>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" onclick="location.reload()"></button>
                         </div>
                         <div class="modal-body">
-                            <p>Your results will be available at the following link when ready: <a href="{% url 'main:table' result_name %}">{{ result_name }}</a><span id="result-link"></span></p>
+                            <p>Your results will be available at the following link when ready: <a href="{% url 'main:table' result_name %}">{{ result_name }}</a></p>
                             <p><small>Please click the 'X' or refresh page to submit another query</small></p>
                         </div>
                         <div class="modal-footer">
@@ -153,6 +152,13 @@
 var result_name = "{{result_name}}";
 
 document.getElementById("KEGG").checked = true;
+
+
+//document.getElementById("myModal").on('hidden', 
+//   function () {
+//        location.reload();
+//    }
+//);
 
 //generate random #
 function uuidv4() {
@@ -212,6 +218,10 @@ document.getElementById("myform").addEventListener("submit",
 
         //result_name
         formData.append("result_name", "{{result_name}}");
+
+        //email
+        formData.append("email", document.getElementById("email").value);
+        formData.append("link", window.location.host + "{% url 'main:table' result_name %}");
 
         //csrf token
         formData.append("csrfmiddlewaretoken", "{{ csrf_token }}");
