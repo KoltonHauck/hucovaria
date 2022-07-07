@@ -1,4 +1,7 @@
-# HuCOVarIa
+# HuCOVaria
+
+##About
+HuCOVaria (Human/COVID-19 Variants Interaction) is a web-tool designed to provide an atlas of Protein-Protein Interaction information between human proteins and SARS-CoV-2 variant proteins. It provides searchable parameters to filter through the 146,146 interactions involving 4,549 human genes across 12 different SARS-CoV-2 strains. It provides a searchable and downloadable table format and a basic network view to visualize the interactions.
 
 ## To Populate the DB
 1. Comment urlpatterns list in main/urls.py file. Uncomment empty urlpatterns list.

@@ -17,9 +17,11 @@
 
 						<div class="btn-group">
 							<button type="button" class="btn btn-primary" onclick="document.getElementById('human_prots_text').value='VAMP4, MOGS, RETSAT, DOK, SCD, SLIT3, DARS2';">Sample</button>
-							<button type="button" class="btn btn-secondary" onclick="document.getElementById('human_prots_text').value = '';">Clear</button>
+							<button type="button" class="btn btn-secondary" onclick="clearHumanProteins();">Clear</button>
 						</div><br>
-
+                        <div class="form-group">
+                            <input type="file" name="file" id="fileInput">
+                        </div>
 				</div>
 
 				<!-- Viral Strains Selection chunk -->
@@ -326,6 +328,27 @@ function myFunct(selection) {
 		chips.appendChild(newChip);
 	}
 }
+
+//button to clear human protein selection
+function clearHumanProteins() {
+    document.getElementById("human_prots_text").value = "";
+    document.getElementById("fileInput").value = "";
+}
+
+//file upload
+document.getElementById("fileInput").addEventListener("change", handleFileSelect, false);
+
+function handleFileSelect(event) {
+    const reader = new FileReader();
+    reader.onload = handleFileLoad;
+    reader.readAsText(event.target.files[0]);
+}
+
+function handleFileLoad(event) {
+    console.log(event);
+    document.getElementById("human_prots_text").textContent = event.target.result;
+}
+
 </script>
 
 {% endblock content %}

@@ -126,8 +126,6 @@ def makeQuery(request):
 
     #send email if given
 
-    print(request.POST.get('email'))
-    print(request.POST.get('link'))
     if request.POST.get('email'):
         send_mail(
             f'HuCoVaria results for {newID}',
