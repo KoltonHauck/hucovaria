@@ -127,7 +127,7 @@
 			<div class="container"><button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#myModal" id="modal_button" hidden>Display Modal</button></div>
 			</form>
 
-			<div class="container"><button class="btn btn-primary" onclick="checkViralProts();">Submit Query</button></div>
+			<div class="container"><button class="btn btn-primary" onclick="checkViralProt_ViralStrains();">Submit Query</button></div>
 
             <!-- query submission modal -->
 			<div class="modal fade" id="myModal" data-bs-keyboard="false" data-bs-backdrop="static">
@@ -174,12 +174,21 @@ function getProteinSelection() {
 	document.getElementById("hidden_sars_prots").value = myArr;
 }
 
-function checkViralProts() {
+//verify that sars proteins/strains have been selected-otherwise display required message
+function checkViralProt_ViralStrains() {
         let numViralProts = document.getElementById("chips").getElementsByTagName("div").length;
         if (numViralProts != 0) {
             document.getElementById("sars_proteins").required = false;
-            document.getElementById("modal_button").click();
         }
+        let numStrainsChecked = document.getElementById("sars_strains_div").querySelectorAll("input[type=checkbox]:checked").length;
+
+        if (numStrainsChecked != 0) {
+            let viralStrains = document.getElementById("sars_strains_div").getElementsByTagName("input");
+            for (var i=0; i<viralStrains.length; i++) {
+                viralStrains[i].required = false;
+            }
+        }
+        document.getElementById("modal_button").click();
 }
 
 //submit button => add formdata
